@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 [Unit]
 Description=sukhi gateway (combined)
-Requires=sukhi-nats.service sukhi-rustfs.service
-After=sukhi-nats.service sukhi-rustfs.service
+Requires=sukhi-nats.service sukhi-rustfs.service sukhi-postgres.service
+After=sukhi-nats.service sukhi-rustfs.service sukhi-postgres.service
 
 [Container]
 ContainerName=sukhi-gateway
@@ -12,9 +12,10 @@ Network=sukhi.network
 # データ(/var/lib/sukhi)の mount は overlay が決める(dev は named volume、prod は箱の bind)。
 Environment=SUKHI_STORE=datalevin
 Environment=DATALEVIN_DIR=/var/lib/sukhi/datalevin
-Environment=SUKHI_QUEUE_DB=/var/lib/sukhi/queue.db
-Environment=DELIVERY_QUEUE_DB=/var/lib/sukhi/delivery_queue.db
-Environment=SUKHI_GRAPH=1
+# ジョブ(Oban)・raw blobs・アカウントは PostgreSQL(base の sukhi-postgres.container)。DB_PASS は下の Secret=。
+Environment=DB_HOST=sukhi-postgres
+Environment=DB_USER=sukhi
+Environment=DB_NAME=sukhi_fedi
 # 翻訳の訳し役(docs/TRANSLATION.md)。sukhi-translate は base の sukhi-translate.container。落ちていても gateway は動く(翻訳だけ失敗する)。
 Environment=LIBRETRANSLATE_URL=http://sukhi-translate:5000
 # gateway は NATS_HOST / NATS_PORT を読む(NATS_URL は bun の sidecar だけが読む)。
@@ -40,6 +41,7 @@ Secret=smtp_username,type=mount,target=SMTP_USERNAME
 Secret=smtp_password,type=mount,target=SMTP_PASSWORD
 Secret=vapid_private_key,type=mount,target=VAPID_PRIVATE_KEY
 Secret=vapid_subject,type=mount,target=VAPID_SUBJECT
+Secret=db_pass,type=mount,target=DB_PASS
 Label=app=sukhi
 DropCapability=ALL
 NoNewPrivileges=true

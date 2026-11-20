@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[Unit]
+Description=sukhi PostgreSQL (job queues, raw blobs, accounts)
+
+[Container]
+ContainerName=sukhi-postgres
+# 第三者の image。Renovate が見る(renovate.json)。ダイジェストは bump で入る。
+Image=docker.io/library/postgres:19-alpine@sha256:8b0ff4cdf221f0c53d7fcda681d3b461be725c492cd881c5ec9c0ad25023f188
+Network=sukhi.network
+# image は uid 70(postgres)で書く。
+UserNS=keep-id:uid=70,gid=70
+User=70:70
+Environment=POSTGRES_USER=sukhi
+Environment=POSTGRES_DB=sukhi_fedi
+# /var/lib/postgresql の mount は overlay が決める(箱の bind)。PGDATA は image の既定(18 から /var/lib/postgresql/<主版>/docker。この下に initdb する)。
+# 初回の initdb だけが読む。gateway の DB_PASS と同じ値の組(podman secret の db_pass)。
+Secret=db_pass,type=env,target=POSTGRES_PASSWORD
+# 公開の口は無い(sukhi.network の中だけ)。箱が小さいので控えめに。gateway の pool は 3 つ × DB_POOL_SIZE(10)。
+Exec=postgres -c shared_buffers=64MB -c max_connections=60
+Label=app=sukhi
+DropCapability=ALL
+NoNewPrivileges=true
+# initdb のあいだの一時 server は TCP を聞かないので、実際に聞き始めるまでは healthy にならない。
+HealthCmd=pg_isready -q -h 127.0.0.1 -U sukhi -d sukhi_fedi
+HealthInterval=15s
+HealthTimeout=5s
+HealthRetries=3
+HealthStartPeriod=60s
+HealthOnFailure=kill
+Notify=healthy
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=180
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target
