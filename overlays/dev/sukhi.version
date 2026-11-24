@@ -4,8 +4,8 @@
 # sukhi.social は公開前なので、いまはこの dev で回す(箱の /etc/sukhi/env=dev)。公開のときに prod へ切り替え、dev の中身は戻す。
 # {{version}} / {{digest:<name>}} を base の unit が参照する(埋めるのは sukhi-setup の sukhi-render)。
 requires-sync: 1
-version: sha-4ac0fd2
-digest.combined:    sha256:1172220fc24587eeac149e0593880dcb11186bd3378e75b15ac145b606572aee
-digest.web-next:    sha256:3be87cb42e2d2ae4275b2ffa4e08086d547a7b67c362e9e79c708067cddefeb1
-digest.anubis:     sha256:e163d08f8c7bab2a02eb6e192e9467a8a5a325862751a7971a575a4cbb360209
-digest.translate:   sha256:2bb4d5f97e6102d7f3f19b7c131b8d3879d33f774f04b2ef7f8076e4c7cf3dac
+version: sha-e3eef55
+digest.combined:    sha256:13e1cb79d395ce7d3f330e08ab010e9949d8086c47f849b0ea0e6a7e03e6d786
+digest.web-next:    sha256:9e253d2f0c17bfea36b0598b7d23d706152cda23ab6ddaf0a20bcfaa52890005
+digest.anubis:     sha256:ec42f3704adb65cd3bfcf3189d33166eb91bfa830cede543b51a66a80f38dd1d
+digest.translate:   sha256:e44633f4cb41d381b680a1f3255fb931fa57f5ad0a738f70d80fc28e2c6f0a22
